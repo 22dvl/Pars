@@ -6,8 +6,8 @@ from urllib.error import HTTPError
 
 api_key="AIzaSyAXMxQYAQEbepn_r4UL2XlKZSK3Qh2yKeU"
 f = open('links.txt')
-a = open('output.txt', 'w')
 sec = input ("Введите минимальную длину в секундах: ")
+a = open('output.txt', 'w')
 for line in f:
     url_data = urlparse(line)
     video_id = url_data.query[2:][:11]
@@ -18,11 +18,16 @@ for line in f:
         continue
     data = json.loads(response)
     all_data=data['items']
-    contentDetails=all_data[0]['contentDetails']
+    try:
+        contentDetails=all_data[0]['contentDetails']
+    except IndexError:
+        continue
     duration=contentDetails['duration']
     dur = parse_duration(duration)
     sectotal = dur.total_seconds()
     if (int(sectotal) <= int(sec)):
+        a.close()
+        a = open('output.txt', 'a')
         a.write(line + '\n')
 print ("Complete")
 a.close()
