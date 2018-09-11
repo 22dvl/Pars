@@ -1,27 +1,28 @@
+import json
+from isodate import parse_duration
 from urllib.request import urlopen
+from urllib.parse import urlparse
 from urllib.error import HTTPError
-from urllib.error import URLError
-from bs4 import BeautifulSoup
 
-urladr = "http://www.pythonscraping.com/pages/page1.html"
-
-def getTitle(url):
+api_key="AIzaSyAXMxQYAQEbepn_r4UL2XlKZSK3Qh2yKeU"
+f = open('links.txt')
+a = open('output.txt', 'w')
+sec = input ("Введите минимальную длину в секундах: ")
+for line in f:
+    url_data = urlparse(line)
+    video_id = url_data.query[2:][:11]
+    searchUrl="https://www.googleapis.com/youtube/v3/videos?id="+video_id+"&key="+api_key+"&part=contentDetails"
     try:
-        ohtml = urlopen(url)                        # Открываем заданную страницу
+        response = urlopen(searchUrl).read()
     except HTTPError:
-        return None
-    except URLError:
-        return None
-    try:
-        html = ohtml.read()                         # Передаем в переменную HTML код страницы
-        head = BeautifulSoup(html, 'html.parser')   # Преобразование HTML кода в структуру BS4
-        title = head.body.h1                        # Извлечение заголовка
-    except AttributeError:
-        return None
-    return title
-
-title = getTitle(urladr)
-if title is None:
-    print("Title could not be found")
-else:
-    print(title)
+        continue
+    data = json.loads(response)
+    all_data=data['items']
+    contentDetails=all_data[0]['contentDetails']
+    duration=contentDetails['duration']
+    dur = parse_duration(duration)
+    sectotal = dur.total_seconds()
+    if (int(sectotal) >= int(sec)):
+        a.write(line + '\n')
+print ("Complete")
+a.close()
