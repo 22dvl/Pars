@@ -22,7 +22,7 @@ for line in f:
     duration=contentDetails['duration']
     dur = parse_duration(duration)
     sectotal = dur.total_seconds()
-    if (int(sectotal) >= int(sec)):
+    if (int(sectotal) <= int(sec)):
         a.write(line + '\n')
 print ("Complete")
 a.close()
