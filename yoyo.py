@@ -34,11 +34,11 @@ datenow = datetime.now()
 datenow = datenow.strftime("%Y-%m-%d")
 
 PT = None
+PTCount = 0
 
-f = open('requests.txt')
 a1 = open('output.txt', 'w')
 
-def youtube_search(q, token,  max_results=50, order=ord, location=None, location_radius=None):
+def youtube_search(q, token,  max_results=50, order=ord):
 
   youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
     developerKey=DEVELOPER_KEY)
@@ -49,15 +49,16 @@ def youtube_search(q, token,  max_results=50, order=ord, location=None, location
     pageToken=token,
     order = order,
     part="id,snippet",
-    maxResults=max_results,
-    location=location
+    maxResults=max_results
 
   ).execute()
 
   global PT
   global ord
+  global PTCount
   PT = search_response.get('nextPageToken')
   search_response['pageToken']=PT
+  PTCount = PTCount + 1
   videos = []
 
   for search_result in search_response.get("items", []):
@@ -74,9 +75,11 @@ def glav():
     global PT
     global f
     global a1
+    global datediff
+    global PTCount
+    f = open('requests.txt')
     for line in f:
-        i=0
-        while i<100:
+        while PTCount <= 18:
             test = youtube_search(line,PT)
             for video in test[1]:
                 datevid = parse_date(video['snippet']['publishedAt'])
@@ -89,34 +92,56 @@ def glav():
                     vid_id = (video['id']['videoId'])
                     a1 = open('output.txt', 'a')
                     a1.write("https://www.youtube.com/watch?v="+vid_id + '\n')
-                    i=i+1
     return
 glav()
 PT = None
-if b == 0:
+PTCount = 0
+if b == '0' and a != '0':
     datediff = 31
     glav()
     datediff = 365
     PT = None
+    PTCount = 0
     glav()
-if a == 0:
+if a == '0' and b != '0':
+    ord = 'viewCount'
+    PT = None
+    PTCount = 0
+    glav()
+    ord = 'rating'
+    PT = None
+    PTCount = 0
+    glav()
+if a == '0' and b == '0':
+    datediff = 31
+    glav()
+    datediff = 365
+    PT = None
+    PTCount = 0
+    glav()
     ord = 'viewCount'
     datediff = 7
     PT = None
+    PTCount = 0
     glav()
     datediff = 31
     PT = None
+    PTCount = 0
     glav()
     datediff = 365
     PT = None
+    PTCount = 0
     glav()
-    ord = 'viewCount'
+    ord = 'rating'
     datediff = 7
     PT = None
+    PTCount = 0
     glav()
     datediff = 31
     PT = None
+    PTCount = 0
     glav()
     datediff = 365
     PT = None
+    PTCount = 0
     glav()
